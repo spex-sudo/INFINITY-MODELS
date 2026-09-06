@@ -302,14 +302,6 @@ img { max-width: 100%; display: block; }
 .slide-dots button.active { background: var(--white); }
 
 @media (max-width: 720px) {
-  .hero-slideshow {
-    height: 55vh;
-    min-height: 340px;
-  }
-  .slide {
-    background-size: contain;
-    background-repeat: no-repeat;
-  }
   .hero-overlay { left: 24px; right: 24px; bottom: 24px; }
   .slide-dots { right: 24px; bottom: 24px; }
   .slide-arrow { display: none; }
