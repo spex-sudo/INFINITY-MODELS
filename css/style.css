@@ -208,6 +208,9 @@ img { max-width: 100%; display: block; }
   min-height: 480px;
   overflow: hidden;
   background: var(--black);
+  aspect-ratio: auto;
+}
+: var(--black);
 }
 
 .slides {
@@ -314,6 +317,11 @@ img { max-width: 100%; display: block; }
 .slide-dots button.active { background: var(--white); }
 
 @media (max-width: 720px) {
+  .hero-slideshow {
+    height: auto;
+    aspect-ratio: 4 / 5;
+    min-height: 420px;
+  }
   .hero-overlay { left: 24px; right: 24px; bottom: 40px; }
   .slide-dots { right: 24px; bottom: 130px; }
   .slide-arrow { display: none; }
