@@ -110,7 +110,8 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // Real width/height of each photo, in the same order as the .slide elements.
     // Update these two arrays if you add, remove, or reorder slides.
-    var ratios = [1425 / 950, 1425 / 950, 1920 / 1080, 800 / 450];
+    // Order matches the .slide elements above: IMG_0093, IMG_0094, IMG_0095, IMG_0096
+    var ratios = [1425 / 950, 1920 / 1080, 1425 / 950, 800 / 450];
 
     slides.forEach(function (_, i) {
       var slideDot = document.createElement('button');
