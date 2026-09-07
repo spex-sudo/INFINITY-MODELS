@@ -1,5 +1,20 @@
 document.addEventListener('DOMContentLoaded', function () {
 
+  var reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  // ---------- Page transition (fade-out on internal link clicks) ----------
+  document.querySelectorAll('a[href]').forEach(function (link) {
+    var href = link.getAttribute('href');
+    var isInternal = href && !href.startsWith('http') && !href.startsWith('mailto:') &&
+      !href.startsWith('#') && link.target !== '_blank';
+    if (!isInternal || reduceMotion) return;
+    link.addEventListener('click', function (e) {
+      e.preventDefault();
+      document.body.classList.add('is-leaving');
+      setTimeout(function () { window.location.href = href; }, 350);
+    });
+  });
+
   // Mobile nav toggle
   var toggle = document.querySelector('.nav-toggle');
   var nav = document.querySelector('.main-nav');
@@ -19,6 +34,70 @@ document.addEventListener('DOMContentLoaded', function () {
     });
   });
 
+  // ---------- Scroll progress bar ----------
+  var progress = document.createElement('div');
+  progress.className = 'scroll-progress';
+  document.body.appendChild(progress);
+  window.addEventListener('scroll', function () {
+    var h = document.documentElement;
+    var scrolled = h.scrollTop / (h.scrollHeight - h.clientHeight || 1);
+    progress.style.transform = 'scaleX(' + Math.min(scrolled, 1) + ')';
+  }, { passive: true });
+
+  // ---------- Cursor dot ----------
+  if (!reduceMotion && window.matchMedia('(pointer: fine)').matches) {
+    var dot = document.createElement('div');
+    dot.className = 'cursor-dot';
+    document.body.appendChild(dot);
+    document.addEventListener('mousemove', function (e) {
+      dot.classList.add('is-active');
+      dot.style.transform = 'translate3d(' + e.clientX + 'px,' + e.clientY + 'px,0)';
+    });
+    document.querySelectorAll('a, button').forEach(function (el) {
+      el.addEventListener('mouseenter', function () { dot.classList.add('is-hovering'); });
+      el.addEventListener('mouseleave', function () { dot.classList.remove('is-hovering'); });
+    });
+  }
+
+  // ---------- Scroll reveal ----------
+  var revealTargets = document.querySelectorAll(
+    '.hero-copy > *, .hero-overlay > *, .section-head, .roster-card, .value-item, .form-wrap'
+  );
+  if ('IntersectionObserver' in window && !reduceMotion) {
+    revealTargets.forEach(function (el, i) {
+      el.classList.add('reveal');
+      el.style.setProperty('--reveal-delay', (i % 4) * 0.08 + 's');
+    });
+    var io = new IntersectionObserver(function (entries) {
+      entries.forEach(function (entry) {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('in-view');
+          io.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.15 });
+    revealTargets.forEach(function (el) { io.observe(el); });
+  }
+
+  // ---------- Marquee (homepage only, right under the hero) ----------
+  var slideshowEl = document.querySelector('.hero-slideshow');
+  if (slideshowEl) {
+    var words = ['Editorial', 'Commercial', 'Runway', 'Fitness', 'Kingston, Jamaica'];
+    var marquee = document.createElement('div');
+    marquee.className = 'marquee';
+    var track = document.createElement('div');
+    track.className = 'marquee-track';
+    for (var r = 0; r < 2; r++) {
+      words.forEach(function (w) {
+        var span = document.createElement('span');
+        span.textContent = w;
+        track.appendChild(span);
+      });
+    }
+    marquee.appendChild(track);
+    slideshowEl.insertAdjacentElement('afterend', marquee);
+  }
+
   // Hero slideshow
   var slideshow = document.querySelector('.hero-slideshow');
   if (slideshow) {
@@ -34,11 +113,11 @@ document.addEventListener('DOMContentLoaded', function () {
     var ratios = [1425 / 950, 1425 / 950, 1920 / 1080, 800 / 450];
 
     slides.forEach(function (_, i) {
-      var dot = document.createElement('button');
-      dot.setAttribute('aria-label', 'Go to slide ' + (i + 1));
-      if (i === 0) dot.classList.add('active');
-      dot.addEventListener('click', function () { goTo(i); });
-      dotsWrap.appendChild(dot);
+      var slideDot = document.createElement('button');
+      slideDot.setAttribute('aria-label', 'Go to slide ' + (i + 1));
+      if (i === 0) slideDot.classList.add('active');
+      slideDot.addEventListener('click', function () { goTo(i); });
+      dotsWrap.appendChild(slideDot);
     });
 
     var dots = Array.prototype.slice.call(dotsWrap.querySelectorAll('button'));
