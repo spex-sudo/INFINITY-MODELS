@@ -167,13 +167,9 @@ document.addEventListener('DOMContentLoaded', function () {
     var dots = Array.prototype.slice.call(dotsWrap.querySelectorAll('button'));
 
     function updateHeight() {
-      if (window.innerWidth <= 1024) {
-        var w = slideshow.clientWidth;
-        var ratio = ratios[current] || 1.5;
-        slideshow.style.height = (w / ratio) + 'px';
-      } else {
-        slideshow.style.height = '';
-      }
+      var w = slideshow.clientWidth;
+      var ratio = ratios[current] || 1.5;
+      slideshow.style.height = (w / ratio) + 'px';
     }
 
     function goTo(index) {
