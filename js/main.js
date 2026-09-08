@@ -98,6 +98,49 @@ document.addEventListener('DOMContentLoaded', function () {
     slideshowEl.insertAdjacentElement('afterend', marquee);
   }
 
+  // ---------- Roster carousel (native scroll, touch/drag friendly, JS auto-advances) ----------
+  var carousel = document.querySelector('.roster-carousel');
+  if (carousel) {
+    var rTrack = carousel.querySelector('.roster-track');
+    var rPaused = false;
+    var rResumeTimer;
+    var rLastTime = null;
+    var rSpeed = 46; // pixels per second — medium pace
+
+    function rPause() {
+      rPaused = true;
+      clearTimeout(rResumeTimer);
+    }
+    function rScheduleResume() {
+      clearTimeout(rResumeTimer);
+      rResumeTimer = setTimeout(function () { rPaused = false; rLastTime = null; }, 2200);
+    }
+
+    carousel.addEventListener('mouseenter', rPause);
+    carousel.addEventListener('mouseleave', function () { rPaused = false; rLastTime = null; });
+    carousel.addEventListener('touchstart', rPause, { passive: true });
+    carousel.addEventListener('touchend', rScheduleResume);
+    carousel.addEventListener('pointerdown', rPause);
+    carousel.addEventListener('pointerup', rScheduleResume);
+    carousel.addEventListener('wheel', function () { rPause(); rScheduleResume(); }, { passive: true });
+
+    if (!reduceMotion) {
+      requestAnimationFrame(function step(timestamp) {
+        if (rLastTime === null) rLastTime = timestamp;
+        var delta = timestamp - rLastTime;
+        rLastTime = timestamp;
+        if (!rPaused) {
+          carousel.scrollLeft += rSpeed * (delta / 1000);
+          var half = rTrack.scrollWidth / 2;
+          if (carousel.scrollLeft >= half) {
+            carousel.scrollLeft -= half;
+          }
+        }
+        requestAnimationFrame(step);
+      });
+    }
+  }
+
   // Hero slideshow
   var slideshow = document.querySelector('.hero-slideshow');
   if (slideshow) {
